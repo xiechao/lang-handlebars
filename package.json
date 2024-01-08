@@ -1,0 +1,36 @@
+{
+  "name": "@xiechao/codemirror-lang-handlebars",
+  "version": "1.0.0",
+  "description": "Handlebars language support for CodeMirror",
+  "scripts": {
+    "test": "mocha test/test.js",
+    "prepare": "rollup -c",
+    "publish": "npm publish --access public"
+  },
+  "type": "module",
+  "main": "dist/index.cjs",
+  "module": "dist/index.js",
+  "exports": {
+    "import": "./dist/index.js",
+    "require": "./dist/index.cjs"
+  },
+  "types": "dist/index.d.ts",
+  "sideEffects": false,
+  "dependencies": {
+    "@codemirror/lang-html": "^6.4.7",
+    "@codemirror/language": "^6.0.0",
+    "@lezer/common": "^1.2.0",
+    "@lezer/highlight": "^1.0.0",
+    "@lezer/lr": "^1.0.0",
+    "codemirror": "^6.0.1"
+  },
+  "devDependencies": {
+    "@lezer/generator": "^1.0.0",
+    "mocha": "^9.0.1",
+    "rollup": "^2.60.2",
+    "rollup-plugin-dts": "^4.0.1",
+    "rollup-plugin-ts": "^3.0.2",
+    "typescript": "^4.3.4"
+  },
+  "license": "MIT"
+}
