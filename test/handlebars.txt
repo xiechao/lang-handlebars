@@ -1,0 +1,56 @@
+# Test Simple Expression Text
+
+<p>{{firstname}}1213{{lastname}}</p>
+
+==>
+
+Template(Text,Insert("{{",Identifier,"}}"),Text,Insert("{{",Identifier,"}}"),Text)
+
+# Test path expressions
+
+{{person.firstname}} 123{{person.lastname}}
+
+==>
+
+Template(Insert("{{",Identifier,"}}"),Text,Insert("{{",Identifier,"}}"))
+
+# Test changing the context
+
+{{../../prefix}}
+
+==>
+
+Template(Insert("{{",Identifier,"}}"))
+
+# Test helper 
+
+{{firstname}} true {{loud a=1 b=2 x="123" lastname true 100 "20" '21'}}
+
+==>
+
+Template(Insert("{{",Identifier,"}}"),Text,Insert("{{",Identifier,Equa(Identifier,Number),Equa(Identifier,Number),Equa(Identifier,String),Identifier,Bool,Number,String,String,"}}"))
+
+# Test escaping
+
+{{{{specialChars sddgb 123 false }}}}
+
+==>
+
+Template(Escape(Any),Text)
+
+# Test buildIn Helper
+
+{{#if qwer asd df "sdg" 123"sd"}}123{{/if}}
+
+===>
+
+Template(Insert("{{",BIHelper,Identifier,Identifier,Identifier,String,Number,String,"}}"),Text,Insert("{{",BIHelper,"}}"))
+
+
+# Test sub expression
+
+{{#if ( isdefined value1 2123 ) 123 dfb }}true{{else}}false{{/if}}
+
+===>
+
+Template(Insert("{{",BIHelper,Subexp(Identifier,Identifier,Number),Number,Identifier,"}}"),Text,Insert("{{",BIHelper,"}}"),Text,Insert("{{",BIHelper,"}}"))

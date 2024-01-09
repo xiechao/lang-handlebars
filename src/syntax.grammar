@@ -1,61 +1,42 @@
+// Very crude grammar for a subset of Twig templating syntax
 
-@top Template { (directive)* }
+@top Template { (directive | Text)* }
 
 directive {
-  Exp |
-  Text |
-  Identifier |
-  Escape |
-  HelperExp |
-  EscapedExp |
-  HelperOpenExp |
-  HelperCloseExp |
-  InlineHelperExp
+  Insert |
+  Escape 
+  // Conditional { ConditionalOpen (directive | Text)* ConditionalClose }
 }
 
-Exp { ExpOpen Identifier ExpClose }
-EscapedExp { EscapeExpStart directive }
-Escape { EscOpen Identifier EscClose}
-HelperExp { ExpOpen Identifier space (Param | SubExp | space)+ ExpClose }
-InlineHelperExp { ExpOpen InlineHelper (Param | SubExp | space)+ ExpClose }
-HelperOpenExp { ExpOpen HelperOpen (Param | SubExp | space)+ ExpClose }
-HelperCloseExp { ExpOpen HelperClose ExpClose }
-SubExp { "(" Identifier (Param | space)+ ")" }
+Insert { "{{" (Identifier | BIHelper) (space* (Identifier | Number | Bool | String | Equa | Subexp))*  space* "}}" }
+
+Escape { "{{{" "{"* Any "}"* "}}}" }
+
+// ConditionalOpen { "{{#" kw<"if"> (Identifier | Number | Bool | String | Equa | space)* "}}" }
+// ConditionalClose { "{{/" kw<"if"> "}}" }
 
 @skip {space} {
 }
 
 kw<word> { @specialize[@name={word}]<Identifier, word> }
-
 Bool { @specialize<Identifier, "true" | "false"> }
+Equa { Identifier "=" (Identifier | Number | Bool | String) }
 
-If { @specialize<Identifier, "#if"> }
-Unless { @specialize<Identifier, "#unless"> }
-Each { @specialize<Identifier, "#each"> }
-With { @specialize<Identifier, "#with"> }
-
-IfClose { @specialize<Identifier, "/if"> }
-UnlessClose { @specialize<Identifier, "/unless"> }
-EachClose { @specialize<Identifier, "/each"> }
-WithClose { @specialize<Identifier, "/with"> }
-
-Lookup { @specialize<Identifier, "lookup"> }
-Log { @specialize<Identifier, "log"> }
-
-InlineHelper { Lookup | Log }
-HelperOpen { If | Unless | Each | With }
-HelperClose { IfClose | UnlessClose | EachClose | WithClose }
-HashParam { Identifier "=" (Identifier | String | Number | Bool) }
-Param { Identifier | String | Number | Bool | HashParam }
-
+BIHelper { @specialize<Identifier, "#if" | "/if" | "#each" | "/each" | "#with" | "/with" | "else" | "#unless" | "lookup" | "log"> }
+Subexp { "(" (space* (Identifier | Number | Bool | String | Equa | Subexp))*  space* ")" }
 @tokens {
-  Identifier { $[a-zA-Z_\-0-9\.\/#@]+ }
-  Text { ![{] Text? | "{" (@eof | ![{] Text?) }
-  Operator { "." | "/" }
-  String { "\"" (Identifier|space)+ "\"" }
+  identifierChar { @asciiLetter | $[_$\u{a1}-\u{10ffff}] | "../" | "#" | "/" }
 
+  word { identifierChar (identifierChar | @digit | "." | "#")* }
+
+  Identifier { word }
+  // Identifier { "."? "./"? @asciiLetter+ ("." @asciiLetter+)?  }
+  Text { ![{] Text? | "{" (@eof | ![{] Text?) }
   hex { @digit | $[a-fA-F] }
 
+  Any { (![{|}])+ }
+
+  String { ("'" (![\\'] | "\\" _)* "'"?) | ("\"" (![\\"] | "\\" _)* "\""?) }
   Number {
     (@digit ("_" | @digit)* ("." ("_" | @digit)*)? | "." @digit ("_" | @digit)*)
       (("e" | "E") ("+" | "-")? ("_" | @digit)+)? |
@@ -64,15 +45,13 @@ Param { Identifier | String | Number | Bool | HashParam }
     "0b" $[01_]+ "n"? |
     "0o" $[0-7_]+ "n"?
   }
-
+  
   space { @whitespace+ }
-  DirectiveContent { ![%}] DirectiveContent? | $[%}] (@eof | ![}] DirectiveContent?) }
-  @precedence { Number Identifier EscapeExpStart Text space DirectiveContent }
-  ExpOpen { "{{" }
-  ExpClose { "}}" }
-  EscOpen { "{{{" }
-  EscClose { "}}}" }
-  EscapeExpStart { "\\" }
+  DirectiveContent { ![}] DirectiveContent? | $[}] (@eof | ![}] DirectiveContent?) }
+  @precedence { space BIHelper Identifier DirectiveContent }
+  "{{"
+  "}}"
+  "."
 }
 
 @external propSource Highlight from "./highlight.js"

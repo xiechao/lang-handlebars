@@ -15,24 +15,10 @@ const mixedParser = parser.configure({
     })
   ],
   wrap: parseMixed(node => {
-    const matchContext = node.matchContext(['Exp', 'Escape',
-      'HelperExp', 'EscapedExp', 'HelperOpenExp', 'HelperCloseExp',
-      'InlineHelperExp']);
-    // console.log({ node });
-    let shouldOverlay = (n: any) => {
-      console.log('=========', n.type.name, '=========')
-      let res = false;
-      let parent = n.prevSibling;
-      while (parent) {
-        console.log({ parent: parent });
-        parent = parent.prevSibling;
-      }
-      return res;
-    };
-    return {
+    return node.type.isTop ? {
       parser: htmlLanguage.parser,
-      overlay: node => shouldOverlay(node)
-    }
+      overlay: node => node.type.name == "Text"
+    } : null
   })
 })
 
