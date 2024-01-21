@@ -4,32 +4,42 @@
 
 directive {
   Insert |
-  Escape 
+  Escape |
+  RawBlock
   // Conditional { ConditionalOpen (directive | Text)* ConditionalClose }
 }
 
-Insert { "{{" (Identifier | BIHelper) (space* (Identifier | Number | Bool | String | Equa | Subexp))*  space* "}}" }
+Insert { "{{" (space* (Identifier | BIHelper | Number | Bool | String | Equa | Subexp | "|" | "^" | "~"))*  space* "}}" }
 
-Escape { "{{{" "{"* Any "}"* "}}}" }
+Escape { "{{{" Any "}}}" | "{{{{{" "{"* Any "}"* "}}}}}" }
 
+RawOpen { "{{{{" Any "}}}}" }
+RawClose { "{{{{" "/" Any "}}}}" }
+
+// @precedence {Escape RawBlock}
 // ConditionalOpen { "{{#" kw<"if"> (Identifier | Number | Bool | String | Equa | space)* "}}" }
 // ConditionalClose { "{{/" kw<"if"> "}}" }
 
 @skip {space} {
+  RawBlock { RawOpen directive RawClose } 
 }
+
+
 
 kw<word> { @specialize[@name={word}]<Identifier, word> }
 Bool { @specialize<Identifier, "true" | "false"> }
 Equa { Identifier "=" (Identifier | Number | Bool | String) }
 
-BIHelper { @specialize<Identifier, "#if" | "/if" | "#each" | "/each" | "#with" | "/with" | "else" | "#unless" | "lookup" | "log"> }
-Subexp { "(" (space* (Identifier | Number | Bool | String | Equa | Subexp))*  space* ")" }
-@tokens {
-  identifierChar { @asciiLetter | $[_$\u{a1}-\u{10ffff}] | "../" | "#" | "/" }
 
-  word { identifierChar (identifierChar | @digit | "." | "#")* }
+Subexp { "(" (space* (Identifier | Number | Bool | String | Equa | Subexp | "|"))*  space* ")" }
+@tokens {
+  identifierChar { @asciiLetter | $[_$\u{a1}-\u{10ffff}] | "../" | "@" }
+
+  word { identifierChar (identifierChar | @digit | "." | "#" | "-" | "_")* }
 
   Identifier { word }
+
+  BIHelper { ("#"|"/"|"*") Identifier | "else" | "else if" | ">" }
   // Identifier { "."? "./"? @asciiLetter+ ("." @asciiLetter+)?  }
   Text { ![{] Text? | "{" (@eof | ![{] Text?) }
   hex { @digit | $[a-fA-F] }
@@ -52,6 +62,7 @@ Subexp { "(" (space* (Identifier | Number | Bool | String | Equa | Subexp))*  sp
   "{{"
   "}}"
   "."
+  "~"
 }
 
 @external propSource Highlight from "./highlight.js"

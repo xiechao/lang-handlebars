@@ -32,11 +32,11 @@ Template(Insert("{{",Identifier,"}}"),Text,Insert("{{",Identifier,Equa(Identifie
 
 # Test escaping
 
-{{{{specialChars sddgb 123 false }}}}
+{{{specialChars sddgb 123 false }}}
 
 ==>
 
-Template(Escape(Any),Text)
+Template(Escape(Any))
 
 # Test buildIn Helper
 
@@ -54,3 +54,89 @@ Template(Insert("{{",BIHelper,Identifier,Identifier,Identifier,String,Number,Str
 ===>
 
 Template(Insert("{{",BIHelper,Subexp(Identifier,Identifier,Number),Number,Identifier,"}}"),Text,Insert("{{",BIHelper,"}}"),Text,Insert("{{",BIHelper,"}}"))
+
+
+# Test blocks
+
+<div class="entry">
+  <h1>{{title}}</h1>
+  <div class="body">
+    {{#noop}}{{body}}{{/noop}}
+  </div>
+</div>
+
+===>
+
+Template(Text,Insert("{{",Identifier,"}}"),Text,Insert("{{",BIHelper,"}}"),Insert("{{",Identifier,"}}"),Insert("{{",BIHelper,"}}"),Text)
+
+# Test basic block variation
+
+<div class="entry">
+  <h1>{{title}}</h1>
+  <div class="body">
+    {{#bold}}{{body}}{{/bold}}
+  </div>
+</div>
+
+===>
+
+Template(Text,Insert("{{",Identifier,"}}"),Text,Insert("{{",BIHelper,"}}"),Insert("{{",Identifier,"}}"),Insert("{{",BIHelper,"}}"),Text)
+
+# Test conditional 
+
+{{#if isActive}}
+  <img src="star.gif" alt="Active">
+{{/if}}
+
+===> 
+
+Template(Insert("{{",BIHelper,Identifier,"}}"),Text,Insert("{{",BIHelper,"}}"))
+
+# Test else if
+
+{{#if isActive}}
+  <img src="star.gif" alt="Active">
+{{else if isInactive}}
+  <img src="cry.gif" alt="Inactive">
+{{/if}}
+
+===>
+
+Template(Insert("{{",BIHelper,Identifier,"}}"),Text,Insert("{{",BIHelper,Identifier,"}}"),Text,Insert("{{",BIHelper,"}}"))
+
+# Test block parameter
+
+{{#each users.data as |user userId|}}
+  Id: {{userId}} Name: {{user.name}}
+{{/each}}
+
+===>
+
+Template(Insert("{{",BIHelper,Identifier,Identifier,Identifier,Identifier,"}}"),Text,Insert("{{",Identifier,"}}"),Text,Insert("{{",Identifier,"}}"),Text,Insert("{{",BIHelper,"}}"))
+
+# Test raw block
+
+{{{{raw-helper}}}}
+  {{bar}}
+{{{{/raw-helper}}}}
+
+===>
+
+Template(RawBlock(RawOpen(Any),Insert("{{",Identifier,"}}"),RawClose(Any)))
+
+# Test White space control
+
+{{#each nav}}
+  <a href="{{url}}">
+    {{#if test}}
+      {{title}}
+    {{^}}
+      Empty
+    {{/if}}
+  </a>
+  {{ 123}}
+{{true 123 "sdg" ~/each }}
+
+===>
+
+Template(Insert("{{",BIHelper,Identifier,"}}"),Text,Insert("{{",Identifier,"}}"),Text,Insert("{{",BIHelper,Identifier,"}}"),Text,Insert("{{",Identifier,"}}"),Text,Insert("{{","}}"),Text,Insert("{{",BIHelper,"}}"),Text,Insert("{{",Number,"}}"),Text,Insert("{{",Bool,Number,String,"~",BIHelper,"}}"))
