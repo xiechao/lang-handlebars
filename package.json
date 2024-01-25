@@ -4,7 +4,7 @@
   "description": "Handlebars language support for CodeMirror",
   "scripts": {
     "test": "LOG=parse mocha test/test.js",
-    "prepare": "rollup -c",
+    "prepare": "lezer-generator src/syntax.grammar -o src/parser && rollup -c",
     "publish": "npm publish --access public"
   },
   "type": "module",

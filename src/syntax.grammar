@@ -5,34 +5,45 @@
 directive {
   Insert |
   Escape |
-  RawBlock
-  // Conditional { ConditionalOpen (directive | Text)* ConditionalClose }
+  RawBlock |
+  BlockComment
 }
 
 Insert { "{{" (space* (Identifier | BIHelper | Number | Bool | String | Equa | Subexp | "|" | "^" | "~"))*  space* "}}" }
 
-Escape { "{{{" Any "}}}" | "{{{{{" "{"* Any "}"* "}}}}}" }
+Escape { "{{{" Any "}}}" | "{{{{{" "{"* Any "}"* "}}}}}"}
 
 RawOpen { "{{{{" Any "}}}}" }
-RawClose { "{{{{" "/" Any "}}}}" }
 
-// @precedence {Escape RawBlock}
-// ConditionalOpen { "{{#" kw<"if"> (Identifier | Number | Bool | String | Equa | space)* "}}" }
-// ConditionalClose { "{{/" kw<"if"> "}}" }
+RawClose { "{{{{/" Any "}}}}" }
+// @precedence { "/", Any }
 
-@skip {space} {
-  RawBlock { RawOpen directive RawClose } 
+// @skip {space} {
+RawBlock { RawOpen (directive | Text)* RawClose }
+// }
+
+@local tokens {
+  blockCommentEnd { "--}}" }
+  blockCommentNewline { "\n" }
+  @else blockCommentContent
 }
 
+@skip {} {
+  BlockComment[isolate] { "{{!--" (blockCommentContent | blockCommentNewline)* blockCommentEnd }
+}
+@skip { spaces | newline }
 
+@context trackNewline from "./tokens.js"
 
-kw<word> { @specialize[@name={word}]<Identifier, word> }
 Bool { @specialize<Identifier, "true" | "false"> }
 Equa { Identifier "=" (Identifier | Number | Bool | String) }
 
 
 Subexp { "(" (space* (Identifier | Number | Bool | String | Equa | Subexp | "|"))*  space* ")" }
 @tokens {
+  spaces[@export] { $[\u0009 \u000b\u00a0\u1680\u2000-\u200a\u202f\u205f\u3000\ufeff]+ }
+  newline[@export] { $[\r\n\u2028\u2029] }
+
   identifierChar { @asciiLetter | $[_$\u{a1}-\u{10ffff}] | "../" | "@" }
 
   word { identifierChar (identifierChar | @digit | "." | "#" | "-" | "_")* }
@@ -55,14 +66,18 @@ Subexp { "(" (space* (Identifier | Number | Bool | String | Equa | Subexp | "|")
     "0b" $[01_]+ "n"? |
     "0o" $[0-7_]+ "n"?
   }
-  
+
   space { @whitespace+ }
-  DirectiveContent { ![}] DirectiveContent? | $[}] (@eof | ![}] DirectiveContent?) }
-  @precedence { space BIHelper Identifier DirectiveContent }
+  @precedence { space BIHelper Identifier }
+  @precedence { spaces, newline, Identifier}
+  @precedence { spaces, newline, Text}
+  @precedence { Any, spaces, newline }
+  @precedence { spaces, newline, space }
   "{{"
   "}}"
   "."
   "~"
+  "/"
 }
 
 @external propSource Highlight from "./highlight.js"

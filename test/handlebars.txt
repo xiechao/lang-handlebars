@@ -112,7 +112,18 @@ Template(Insert("{{",BIHelper,Identifier,"}}"),Text,Insert("{{",BIHelper,Identif
 
 ===>
 
-Template(Insert("{{",BIHelper,Identifier,Identifier,Identifier,Identifier,"}}"),Text,Insert("{{",Identifier,"}}"),Text,Insert("{{",Identifier,"}}"),Text,Insert("{{",BIHelper,"}}"))
+Template(
+  Insert(
+    "{{",BIHelper,Identifier,Identifier,Identifier,Identifier,"}}"
+  ),
+  Text,
+  Insert(
+    "{{",Identifier,"}}"
+  ),
+  Text,
+  Insert("{{",Identifier,"}}"),
+  Insert("{{",BIHelper,"}}")
+)
 
 # Test raw block
 
@@ -139,4 +150,17 @@ Template(RawBlock(RawOpen(Any),Insert("{{",Identifier,"}}"),RawClose(Any)))
 
 ===>
 
-Template(Insert("{{",BIHelper,Identifier,"}}"),Text,Insert("{{",Identifier,"}}"),Text,Insert("{{",BIHelper,Identifier,"}}"),Text,Insert("{{",Identifier,"}}"),Text,Insert("{{","}}"),Text,Insert("{{",BIHelper,"}}"),Text,Insert("{{",Number,"}}"),Text,Insert("{{",Bool,Number,String,"~",BIHelper,"}}"))
+Template(
+  Insert("{{",BIHelper,Identifier,"}}"),
+  Text,
+  Insert("{{",Identifier,"}}"),
+  Text,
+  Insert("{{",BIHelper,Identifier,"}}"),
+  Insert("{{",Identifier,"}}"),
+  Insert("{{","}}"),
+  Text,
+  Insert("{{",BIHelper,"}}"),
+  Text,
+  Insert("{{",Number,"}}"),
+  Insert("{{",Bool,Number,String,"~",BIHelper,"}}")
+)
