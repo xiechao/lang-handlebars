@@ -6,7 +6,8 @@ directive {
   Insert |
   Escape |
   RawBlock |
-  BlockComment
+  BlockComment |
+  OnelineComment
 }
 
 Insert { "{{" (space* (Identifier | BIHelper | Number | Bool | String | Equa | Subexp | "|" | "^" | "~"))*  space* "}}" }
@@ -29,9 +30,18 @@ RawBlock { RawOpen (directive | Text)* RawClose }
 }
 
 @skip {} {
-  BlockComment[isolate] { "{{!--" (blockCommentContent | blockCommentNewline)* blockCommentEnd }
+  BlockComment { "{{!--" (blockCommentContent | blockCommentNewline)* blockCommentEnd }
 }
 @skip { spaces | newline }
+
+@local tokens {
+  oneLineCommentEnd { "}}" }
+  @else oneLineCommentContent
+}
+
+@skip {} {
+  OnelineComment { "{{!" oneLineCommentContent* oneLineCommentEnd }
+}
 
 @context trackNewline from "./tokens.js"
 

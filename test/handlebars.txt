@@ -176,3 +176,11 @@ Template(
 ===>
 
 Template(BlockComment)
+
+# Test oneline comment
+
+{{! one line comment }}
+
+===>
+
+Template(OnelineComment)
