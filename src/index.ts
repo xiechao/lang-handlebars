@@ -12,7 +12,8 @@ const mixedParser = parser.configure({
         let closed = /^\s*\{% endif/.test(cx.textAfter)
         return cx.lineIndent(cx.node.from) + (closed ? 0 : cx.unit)
       }
-    })
+    }),
+
   ],
   wrap: parseMixed(node => {
     return node.type.isTop ? {

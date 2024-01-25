@@ -164,3 +164,15 @@ Template(
   Insert("{{",Number,"}}"),
   Insert("{{",Bool,Number,String,"~",BIHelper,"}}")
 )
+
+# Test annotation
+
+{{!--
+  123 sdnfghn sddb sfdb
+  dfbfgb sdbgb ` 「 dsf
+  {{t 'sdd'}}
+--}}
+
+===>
+
+Template(BlockComment)

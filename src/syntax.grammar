@@ -77,7 +77,6 @@ Subexp { "(" (space* (Identifier | Number | Bool | String | Equa | Subexp | "|")
   "}}"
   "."
   "~"
-  "/"
 }
 
 @external propSource Highlight from "./highlight.js"
