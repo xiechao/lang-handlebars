@@ -13,7 +13,7 @@ npm install @xiechao/codemirror-lang-handlebars
 Then you can use it like so:
 
 ```javascript
-import { handlebarsLanguage } from "@ssddanbrown/codemirror-lang-twig"
+import { handlebarsLanguage } from "@xiechao/codemirror-lang-handlebars"
 
 handlebarsLanguage // => https://codemirror.net/docs/ref/#language.LRLanguage
 ```
