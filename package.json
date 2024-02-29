@@ -1,6 +1,6 @@
 {
   "name": "@xiechao/codemirror-lang-handlebars",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Handlebars language support for CodeMirror6",
   "scripts": {
     "test": "LOG=parse mocha test/test.js",
