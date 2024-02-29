@@ -16,7 +16,7 @@ const spaces = 31,
 const trackNewline = new lr.ContextTracker({
     start: false,
     shift(context, term) {
-        return term == BlockComment || term == spaces ? context : term == newline;
+        return term == BlockComment || term == spaces ? context : term == newline
     },
     strict: false
 });
